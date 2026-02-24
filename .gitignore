@@ -1,0 +1,22 @@
+## os relics
+.DS_Store
+
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+*.fdb_latexmk
+
+## spec files
+spec/*.gz
+spec/*.pdf
+spec/*OUTDIR*
