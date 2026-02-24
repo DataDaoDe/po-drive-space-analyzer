@@ -2,8 +2,6 @@
 
 ## Project: Drive Space Analyzer (macOS-first)
 
----
-
 # 1. Vision
 
 **Drive Space Analyzer** is a high-performance, extensible disk analysis engine and toolchain that helps users understand exactly:
@@ -23,16 +21,11 @@ The long-term vision is to become:
 
 > The most accurate, fastest, and most extensible disk intelligence system for developers, power users, and professionals.
 
----
-
 # 2. Core Problem
 
-Users frequently:
+Users frequently run out of disk space unexpectedly and have no idea what is taking up space
 
-* Run out of disk space unexpectedly
-* Have no idea what is taking up space
-* Don’t understand:
-
+* They don’t understand:
   * System caches
   * Xcode build artifacts
   * Docker volumes
@@ -50,15 +43,11 @@ Existing tools are:
 * Not extensible
 * Not developer-friendly
 
----
-
 # 3. Product Goals
 
 ## 3.1 Primary Goal
 
 > Help users quickly and accurately understand where their disk space is going and safely reclaim it.
-
----
 
 ## 3.2 Strategic Goals
 
@@ -76,8 +65,6 @@ Existing tools are:
    * Analysis logic
    * OS-specific heuristics
    * UI layers
-
----
 
 # 4. Non-Goals
 
@@ -110,8 +97,6 @@ Existing tools are:
 * Not CPU optimizer
 * Not “boost your Mac” gimmick
 
----
-
 # 5. Objectives
 
 ## 5.1 Technical Objectives
@@ -122,23 +107,18 @@ Existing tools are:
 * Parallel directory traversal
 * Bundle-aware (macOS .app, .framework, etc.)
 * Handle:
-
   * Symlinks
   * Hard links
   * Permissions
   * Sparse files
-  * APFS snapshots (eventually)
-
----
+  * APFS snapshots (macOS - eventually)
 
 ## 5.2 User Objectives
 
 Users should be able to:
-
 * See largest directories
 * See largest files
 * See size distribution by:
-
   * File type
   * Extension
   * Owner
@@ -149,8 +129,6 @@ Users should be able to:
 * Identify cache directories
 * Identify stale backups
 
----
-
 # 6. High-Level Architecture
 
 ```
@@ -158,18 +136,14 @@ drive-space-analyzer/
 │
 ├── core/                # Rust engine (filesystem scanning + metrics)
 ├── analysis/            # Higher-level metrics & domain logic
-├── os-macos/            # macOS-specific logic
+├── os-macos/            # macOS-specific logic & tooling
 ├── os-linux/
 ├── os-windows/
 ├── cli/                 # CLI interface
 └── gui/                 # Future cross-platform GUI
 ```
 
----
-
 # 7. Feature Set
-
----
 
 # 7.1 Core Engine
 
@@ -181,7 +155,6 @@ Low-level high-performance file traversal and metric computation.
 
 1. Recursive directory traversal
 2. File metadata collection:
-
    * Path
    * Size
    * Allocated size
@@ -214,8 +187,6 @@ pub struct ScanOptions {
 * Should allow streaming output
 * Should allow incremental analysis
 
----
-
 # 7.2 Metrics Engine
 
 ### Computed Metrics
@@ -228,8 +199,6 @@ pub struct ScanOptions {
 * Top N largest directories
 * Histogram of file sizes
 * Age distribution
-
----
 
 # 7.3 macOS-Specific Features
 
@@ -256,8 +225,6 @@ macOS is phase 1 priority.
 * Sparse files
 * Snapshots
 * Clones
-
----
 
 # 7.4 CLI Tool
 
@@ -292,8 +259,6 @@ dsa scan ~/ --profile video-editing
 * Pipe-friendly
 * Configurable ignore rules
 
----
-
 # 7.5 GUI (Future)
 
 Cross-platform (Tauri or something similar TBD).
@@ -307,8 +272,6 @@ Cross-platform (Tauri or something similar TBD).
   * “These 45GB are Final Cut render files”
 * Safe delete recommendations
 * Profile-based analysis
-
----
 
 # 8. Profiles
 
@@ -351,7 +314,6 @@ struct Profile {
 }
 ```
 
----
 
 # 9. Performance Requirements
 
@@ -361,8 +323,6 @@ struct Profile {
 * Controlled memory footprint
 * Optional incremental cache system
 
----
-
 # 10. Safety Principles
 
 1. Never delete automatically.
@@ -370,7 +330,6 @@ struct Profile {
 3. Never hide system-critical directories.
 4. Be transparent in heuristics.
 
----
 
 # 11. UX Philosophy
 
@@ -382,11 +341,8 @@ This tool should feel:
 * Deterministic
 * Reproducible
 
-No magic.
+There should be no magic and everything should be inspectable.
 
-Everything inspectable.
-
----
 
 # 12. Future Expansion Ideas
 
@@ -399,8 +355,6 @@ Everything inspectable.
 * Drive health analytics
 * NAS support
 * Network scanning
-
----
 
 # 13. Success Criteria
 
@@ -416,7 +370,6 @@ Everything inspectable.
 * Users understand why space is consumed
 * Developers use CLI in scripts
 
----
 
 # 14. MVP Definition (macOS)
 
