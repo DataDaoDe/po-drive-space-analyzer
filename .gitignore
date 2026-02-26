@@ -25,3 +25,8 @@
 
 # But keep PDFs inside docs/build/
 !docs/build/*.pdf
+
+# python
+.mypy_cache/
+__pycache__/
+*.py[oc]
