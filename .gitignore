@@ -15,8 +15,13 @@
 *.cb2
 .*.lb
 *.fdb_latexmk
+*.synctex.gz
 
-## spec files
-spec/*.gz
-spec/*.pdf
-spec/*OUTDIR*
+# Ignore any directory named literally "%OUTDIR%" anywhere in the repo
+%OUTDIR%/
+
+# Ignore all PDFs
+*.pdf
+
+# But keep PDFs inside docs/build/
+!docs/build/*.pdf
