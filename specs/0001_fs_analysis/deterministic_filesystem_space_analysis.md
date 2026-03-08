@@ -1,0 +1,183 @@
+# A Formal Model for Deterministic Filesystem Space Analysis
+
+```latex
+\section*{Spec 1: A Formal Model for Deterministic Filesystem Space Analysis}
+
+\subsection*{Introduction}
+
+We present a formal model for deterministic disk space analysis over a finite filesystem.
+The objective is to define the mathematical structures, invariants, and aggregation
+properties that a correct implementation must satisfy, independent of operating system or implementation language.
+
+\subsection*{Filesystem Model}
+
+\begin{definition}[Filesystem Graph]
+A filesystem is a finite directed multigraph
+\[
+\mathcal{F} = (V, E, \tau, \mu),
+\]
+where $V$ is a finite set of nodes, $E \subseteq V \times V$ is a set of directed edges,
+$\tau : V \to T$ assigns a type to each node, and
+$\mu : V \to \mathbb{N}$ assigns a non-negative size measure.
+The type set is $T = \{\mathrm{file}, \mathrm{dir}, \mathrm{symlink}, \mathrm{special}\}$.
+\end{definition}
+
+We distinguish a subset $E_d \subseteq E$ representing directory containment.
+The induced subgraph $(V, E_d)$ is acyclic when restricted to nodes of type $\mathrm{dir}$ and $\mathrm{file}$.
+
+\begin{definition}[Containment Forest]
+Let $V_0 = \{ v \in V \mid \tau(v) \in \{\mathrm{file}, \mathrm{dir}\} \}$.
+Then $(V_0, E_d)$ forms a finite forest.
+\end{definition}
+
+\subsection*{Aggregation Semantics}
+
+Let $r \in V$ be a designated root.
+
+\begin{definition}[Recursive Aggregation]
+Define $A : V \to \mathbb{N}$ recursively by
+\[
+A(v) =
+\begin{cases}
+\mu(v), & \tau(v) = \mathrm{file}, \\
+\sum_{(v,u) \in E_d} A(u), & \tau(v) = \mathrm{dir}.
+\end{cases}
+\]
+\end{definition}
+
+\begin{proposition}
+For any directory $v$,
+\[
+A(v) = \sum_{u \in \mathrm{Desc}_f(v)} \mu(u).
+\]
+\end{proposition}
+
+\begin{proof}
+Proceed by induction on directory height.
+
+If $v$ contains only files, then
+\[
+A(v) = \sum_{(v,u)\in E_d} \mu(u),
+\]
+which equals the sum over $\mathrm{Desc}_f(v)$.
+
+Suppose the statement holds for all strict subdirectories of $v$.
+Then
+\[
+A(v) = \sum_{(v,u)\in E_d} A(u).
+\]
+
+Each $u$ is either a file or a directory.
+If $u$ is a file, $A(u)=\mu(u)$.
+If $u$ is a directory, by the inductive hypothesis,
+\[
+A(u) = \sum_{w \in \mathrm{Desc}_f(u)} \mu(w).
+\]
+
+Therefore
+\[
+A(v) = \sum_{u \in \mathrm{Desc}_f(v)} \mu(u).
+\]
+\end{proof}
+
+\subsection*{Hard Link Equivalence}
+
+Let $\sim$ be an equivalence relation on file nodes representing shared inodes.
+
+\begin{definition}[Inode Quotient]
+Let $\tilde{V} = V / \sim$ and define
+\[
+\tilde{\mu}([v]) = \mu(v).
+\]
+Aggregation must be computed over equivalence classes rather than individual representatives.
+\end{definition}
+
+\begin{theorem}[No Double Counting]
+If aggregation is performed over $\tilde{V}$, then each physical storage unit contributes exactly once to $A(r)$.
+\end{theorem}
+
+\begin{proof}
+Each equivalence class corresponds to a unique physical allocation.
+Since $\tilde{\mu}$ is defined on classes and summation is over distinct classes,
+duplication is eliminated.
+\end{proof}
+
+\subsection*{Traversal Correctness}
+
+\begin{definition}[Traversal Function]
+A traversal is a function
+\[
+T : V \to \{0,1\}
+\]
+indicating whether a node has been visited.
+\end{definition}
+
+\begin{proposition}[Termination]
+If traversal maintains a visited set and $V$ is finite, then traversal terminates even in the presence of symbolic link cycles.
+\end{proposition}
+
+\begin{proof}
+Each node enters the visited set at most once.
+Since $|V|<\infty$, recursion depth is finite.
+\end{proof}
+
+\subsection*{Metric Algebra}
+
+Let $(\mathbb{N}, +, 0)$ denote the additive monoid of non-negative integers.
+
+\begin{definition}[Monoidal Fold]
+Directory aggregation is a fold over $(V_0,E_d)$ with respect to the monoid $(\mathbb{N}, +, 0)$.
+\end{definition}
+
+\begin{proposition}
+Aggregation is associative and independent of traversal order.
+\end{proposition}
+
+\begin{proof}
+Associativity and commutativity of $+$ imply order independence.
+\end{proof}
+
+\subsection*{Determinism}
+
+\begin{theorem}[Deterministic Output]
+If two filesystem graphs $\mathcal{F}_1$ and $\mathcal{F}_2$ are isomorphic
+and preserve $\mu$ and $\tau$, then aggregation outputs are equal.
+\end{theorem}
+
+\begin{proof}
+Aggregation depends only on graph structure and measure $\mu$.
+Graph isomorphism preserving these structures yields identical sums.
+\end{proof}
+
+\subsection*{Complexity Bound}
+
+Let $n = |V|$.
+
+\begin{proposition}
+A complete traversal with aggregation requires $O(n)$ time.
+\end{proposition}
+
+\begin{proof}
+Each node and edge is processed at most once.
+\end{proof}
+
+\subsection*{Memory Bound}
+
+Let $h$ denote maximum directory depth.
+
+\begin{proposition}
+A depth-first traversal requires $O(h)$ auxiliary memory.
+\end{proposition}
+
+\begin{proof}
+At any time, the call stack contains at most one node per depth level.
+\end{proof}
+
+\subsection*{Conclusion}
+
+The Drive Space Analyzer is formally characterized as a deterministic monoidal aggregation
+over a finite containment forest derived from a filesystem graph.
+Correctness requires quotienting by inode equivalence, ensuring termination under cyclic symbolic references,
+and preserving traversal-order invariance.
+
+```
